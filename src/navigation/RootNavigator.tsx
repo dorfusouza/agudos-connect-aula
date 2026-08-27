@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import SobreScreen from '../screens/SobreScreen';
 import TabNavigator from './TabNavigator';
+import StoreDetailScreen from '../screens/StoreDetailScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -11,6 +12,7 @@ export default function RootNavigator(){
         <NavigationContainer>
             <Stack.Navigator>
                 <Stack.Screen name='Tabs' component={TabNavigator} options={{headerShown:false}}/>
+                <Stack.Screen name='StoreDetail' component={StoreDetailScreen} options={{title: 'Detalhes da Loja'}}/>
                 <Stack.Screen name='Sobre' component={SobreScreen} options={{title: 'Sobre'}} />
             </Stack.Navigator>
         </NavigationContainer>

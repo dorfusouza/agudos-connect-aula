@@ -1,8 +1,15 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { stores } from "../data/stores";
 import StoreCard from "../components/StoreCard";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../types";
+
+type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function HomeScreen() {
+    const navigation = useNavigation<RootNavigationProp>();
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -13,7 +20,9 @@ export default function HomeScreen() {
           empilha um embaixo do outro, com espaçamento uniforme via `gap` */}
             <View style={styles.list}>
                 {stores.map((store) => (
-                    <StoreCard key={store.name} store={store} />
+                    <Pressable key={store.id} onPress={() => navigation.navigate('StoreDetail', { StoreId: store.id})}>
+                        <StoreCard store={store} />
+                    </Pressable>
                 ))}
             </View>
         </View>
