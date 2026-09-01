@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { stores } from "../data/stores";
 import StoreCard from "../components/StoreCard";
 import { useNavigation } from "@react-navigation/native";
@@ -6,20 +6,33 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
 import { useEffect } from "react";
 import { api } from "../services/api";
+import { useStores } from "../hooks/useStores";
 
 type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function HomeScreen() {
     const navigation = useNavigation<RootNavigationProp>();
+    const { stores, loading, error } = useStores();
+    
+    if(loading) {
+        return (
+            <View style={styles.centered}>
+                <ActivityIndicator size="large" color="#1E2761" />
+                <Text style={styles.hint}>Carregando lojas...</Text>
+            </View>
+        )
+    }
 
-    useEffect(() => {
-        api.get('/stores')
-            .then(response => console.log('[Aula 03] /Store respondeu: ', response.data))
-            .catch(error => console.log(error));
-    }, []);
+    if(error) {
+        return (
+            <View style={styles.centered}>
+                <Text style={styles.errorText}>{error}</Text>
+            </View>
+        )
+    }
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.title}>Serviços perto de você</Text>
             </View>
@@ -33,7 +46,7 @@ export default function HomeScreen() {
                     </Pressable>
                 ))}
             </View>
-        </View>
+        </ScrollView>
     )
 };
 
@@ -41,6 +54,22 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+    },
+    centered: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 24,
+    },
+    hint: {
+        marginTop: 12,
+        fontSize: 14,
+        color: '#666',
+    },
+    errorText: {
+        color: '#B00020',
+        textAlign: 'center',
+        fontSize: 15,
     },
     header: {
         paddingHorizontal: 16,
