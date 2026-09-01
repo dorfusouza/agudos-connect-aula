@@ -4,11 +4,19 @@ import StoreCard from "../components/StoreCard";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
+import { useEffect } from "react";
+import { api } from "../services/api";
 
 type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function HomeScreen() {
     const navigation = useNavigation<RootNavigationProp>();
+
+    useEffect(() => {
+        api.get('/stores')
+            .then(response => console.log('[Aula 03] /Store respondeu: ', response.data))
+            .catch(error => console.log(error));
+    }, []);
 
     return (
         <View style={styles.container}>
