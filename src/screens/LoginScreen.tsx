@@ -6,7 +6,7 @@ export default function LoginScreen() {
   const { login, user } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-
+  
   function handleLogin() {
     login(name, email);
     // Teste temporário da Aula 06 — confirma que o AuthContext guardou os
