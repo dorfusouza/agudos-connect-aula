@@ -1,10 +1,25 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types';
+import { useAuth } from '../context/AuthContext';
+
+type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function ProfileScreen() {
+  const navigation = useNavigation<RootNavigationProp>()
+  const { user } = useAuth();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Perfil</Text>
-      <Text style={styles.hint}>Em breve: login e dados do usuário.</Text>
+      {user ? (
+        <Text>Logado como {user.name} ({user.email})</Text>
+      ):(
+        <Text>Ninguém logado ainda</Text>
+      )}
+      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <Text>Ir para Login (teste)</Text>
+      </TouchableOpacity>
     </View>
   );
 }
