@@ -3,15 +3,12 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen() {
-  const { login, user } = useAuth();
+  const { login } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  
+
   function handleLogin() {
     login(name, email);
-    // Teste temporário da Aula 06 — confirma que o AuthContext guardou os
-    // dados certos. Sai daqui quando a navegação condicional entrar (Aula 07).
-    console.log('[Aula 06] usuário logado no contexto:', { name, email });
   }
 
   return (
@@ -39,12 +36,6 @@ export default function LoginScreen() {
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
-
-      {/* Só pra visualizar o estado do contexto ao vivo durante a aula —
-          mostra que o AuthContext guardou o que foi digitado. Sai depois. */}
-      {user && (
-        <Text style={styles.debug}>Contexto guardou: {user.name} ({user.email})</Text>
-      )}
     </View>
   );
 }

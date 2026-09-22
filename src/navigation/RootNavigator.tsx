@@ -5,17 +5,25 @@ import SobreScreen from '../screens/SobreScreen';
 import TabNavigator from './TabNavigator';
 import StoreDetailScreen from '../screens/StoreDetailScreen';
 import LoginScreen from '../screens/LoginScreen';
+import { useAuth } from '../context/AuthContext';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function RootNavigator(){
+export default function RootNavigator() {
+    const { user } = useAuth();
+
     return (
         <NavigationContainer>
             <Stack.Navigator>
-                <Stack.Screen name='Tabs' component={TabNavigator} options={{headerShown:false}}/>
-                <Stack.Screen name='StoreDetail' component={StoreDetailScreen} options={{title: 'Detalhes da Loja'}}/>
-                <Stack.Screen name='Sobre' component={SobreScreen} options={{title: 'Sobre'}} />
-                <Stack.Screen name='Login' component={LoginScreen}  options={{title: 'Entrar'}}/>
+                {user ? (
+                    <>
+                        <Stack.Screen name='Tabs' component={TabNavigator} options={{ headerShown: false }} />
+                        <Stack.Screen name='StoreDetail' component={StoreDetailScreen} options={{ title: 'Detalhes da Loja' }} />
+                        <Stack.Screen name='Sobre' component={SobreScreen} options={{ title: 'Sobre' }} />
+                    </>
+                ) : (
+                    <Stack.Screen name='Login' component={LoginScreen} options={{ title: 'Entrar' }} />
+                )}
             </Stack.Navigator>
         </NavigationContainer>
     )
