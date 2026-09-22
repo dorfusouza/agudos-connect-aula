@@ -11,3 +11,11 @@ export type TabParamList = {
     Agenda: undefined;
     Perfil: undefined;
 }
+
+export type Schedule = {
+    id: string;
+    storeId: string;
+    storeName: string;
+    slot: string;
+    createdAt: string; //ISO string
+}
