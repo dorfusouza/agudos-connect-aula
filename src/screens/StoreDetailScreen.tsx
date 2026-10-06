@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types'
 import { useStore } from '../hooks/useStore'
+import { addSchedule } from '../storage/schedulesStorage'
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'StoreDetail'>
@@ -12,7 +13,8 @@ const TIME_SLOTS = ['09:00', '10:30', '13:00', '14:30', '16:00']
 
 export default function StoreDetailScreen({ route }: Props) {
     const { store, loading, error } = useStore(route.params.StoreId)
-    // Estado LOCAL da tela: some ao fechar o app. Persistir de verdade é a Aula 09 (AsyncStorage).
+    // Estado LOCAL da tela (horário escolhido e confirmação). O agendamento em si agora é
+    // salvo no AsyncStorage; saving, erro e a mensagem final ficam para a Aula 11.
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
     const [confirmed, setConfirmed] = useState(false)
 
@@ -63,7 +65,11 @@ export default function StoreDetailScreen({ route }: Props) {
             <Pressable
                 style={[styles.confirmButton, !selectedSlot && styles.confirmButtonDisabled]}
                 disabled={!selectedSlot}
-                onPress={() => setConfirmed(true)}
+                onPress={async () => {
+                    // Ligação mínima (Aula 10): só salva, para a aba Agenda ter dado real.
+                    await addSchedule({ storeId: store.id, storeName: store.name, slot: selectedSlot! })
+                    setConfirmed(true)
+                }}
             >
                 <Text style={styles.confirmButtonText}>Agendar Agora</Text>
             </Pressable>
