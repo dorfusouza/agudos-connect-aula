@@ -8,13 +8,23 @@ import { getSchedules, removeSchedule } from '../storage/schedulesStorage'
 export function useSchedules() {
     const [schedules, setSchedules] = useState<Schedule[]>([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     const load = useCallback(async () => {
-        const data = await getSchedules()
-        // Mais recente primeiro. createdAt é ISO string, então a ordem
-        // alfabética das strings já é a ordem cronológica.
-        setSchedules([...data].sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
-        setLoading(false)
+        // Aula 11: sem try/catch, uma falha do storage deixava a Agenda girando
+        // para sempre (setLoading(false) nunca rodava). O finally garante que
+        // o loading termina com sucesso OU com erro.
+        try {
+            setError(null)
+            const data = await getSchedules()
+            // Mais recente primeiro. createdAt é ISO string, então a ordem
+            // alfabética das strings já é a ordem cronológica.
+            setSchedules([...data].sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
+        } catch {
+            setError('Não foi possível carregar seus agendamentos.')
+        } finally {
+            setLoading(false)
+        }
     }, [])
 
     // useEffect roda só quando o componente MONTA — e as abas do Tab Navigator
@@ -27,9 +37,13 @@ export function useSchedules() {
     )
 
     async function cancelSchedule(id: string) {
-        await removeSchedule(id)
-        await load() // recarrega do storage: a tela mostra o que está salvo de verdade
+        try {
+            await removeSchedule(id)
+            await load() // recarrega do storage: a tela mostra o que está salvo de verdade
+        } catch {
+            setError('Não foi possível cancelar o agendamento.')
+        }
     }
 
-    return { schedules, loading, cancelSchedule }
+    return { schedules, loading, error, cancelSchedule }
 }

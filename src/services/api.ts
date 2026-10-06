@@ -3,7 +3,10 @@ import axios from 'axios';
 // URL de produção do my-json-server, apontando pro nosso repositório
 // agudos-connect-api (db.json publicado no GitHub) — funciona de qualquer
 // lugar (emulador, celular físico, web), sem precisar rodar nada localmente.
-const API_BASE_URL = 'https://my-json-server.typicode.com/dorfusouza/agudos-connect-api';
+// CONTINGÊNCIA (06/10/2026): o my-json-server está fora do ar (HTTP 530), então lemos o
+// mesmo db.json direto do GitHub. Quando o serviço voltar, restaurar a linha abaixo:
+// const API_BASE_URL = 'https://my-json-server.typicode.com/dorfusouza/agudos-connect-api';
+const API_BASE_URL = 'https://raw.githubusercontent.com/dorfusouza/agudos-connect-api/master';
 
 // Alternativas pra quando quiser rodar o json-server LOCAL (`npm start` dentro
 // de agudos-connect-api, porta 3001) em vez da versão de produção — deixamos

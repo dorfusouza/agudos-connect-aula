@@ -6,9 +6,19 @@ export default function LoginScreen() {
   const { login } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  // Aula 11: mensagem de validação visível (null = sem erro).
+  const [error, setError] = useState<string | null>(null);
 
   function handleLogin() {
-    login(name, email);
+    // trim() descarta espaços: "   " conta como campo vazio.
+    if (!name.trim() || !email.trim()) {
+      setError('Preencha nome e e-mail para entrar.');
+      return; // não chama login() com dados inválidos
+    }
+    setError(null);
+    // Sem navigate(): ao guardar o usuário no contexto, o RootNavigator
+    // (que lê `user` do AuthContext) troca o Login pelas abas sozinho.
+    login(name.trim(), email.trim());
   }
 
   return (
@@ -32,6 +42,8 @@ export default function LoginScreen() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
+
+      {error && <Text style={styles.errorText}>{error}</Text>}
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Entrar</Text>
@@ -59,6 +71,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 24,
   },
+  errorText: { color: '#B00020', fontSize: 13, marginTop: 12 },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   debug: { marginTop: 20, fontSize: 13, color: '#1E2761' },
 });

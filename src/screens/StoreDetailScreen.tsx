@@ -13,10 +13,12 @@ const TIME_SLOTS = ['09:00', '10:30', '13:00', '14:30', '16:00']
 
 export default function StoreDetailScreen({ route }: Props) {
     const { store, loading, error } = useStore(route.params.StoreId)
-    // Estado LOCAL da tela (horário escolhido e confirmação). O agendamento em si agora é
-    // salvo no AsyncStorage; saving, erro e a mensagem final ficam para a Aula 11.
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
     const [confirmed, setConfirmed] = useState(false)
+    // Aula 11: estados da AÇÃO de salvar. `saving` desabilita o botão enquanto o
+    // AsyncStorage trabalha (evita toque duplo); `saveError` mostra a falha na tela.
+    const [saving, setSaving] = useState(false)
+    const [saveError, setSaveError] = useState<string | null>(null)
 
     if (loading) {
         return (
@@ -32,6 +34,21 @@ export default function StoreDetailScreen({ route }: Props) {
                 <Text style={styles.errorText}>{error ?? 'Loja não encontrada.'}</Text>
             </View>
         )
+    }
+
+    const handleSchedule = async () => {
+        if (!selectedSlot) return
+        setSaving(true)
+        setSaveError(null)
+        try {
+            await addSchedule({ storeId: store.id, storeName: store.name, slot: selectedSlot })
+            setConfirmed(true)
+        } catch {
+            // Falhou: não mostra "Agendado!" e deixa o aluno tentar de novo.
+            setSaveError('Não foi possível salvar o agendamento. Tente novamente.')
+        } finally {
+            setSaving(false) // roda sempre: com sucesso ou com erro, o botão volta ao normal
+        }
     }
 
     return (
@@ -52,6 +69,7 @@ export default function StoreDetailScreen({ route }: Props) {
                         onPress={() => {
                             setSelectedSlot(slot)
                             setConfirmed(false) // trocou de horário: a confirmação anterior não vale mais
+                            setSaveError(null)
                         }}
                     >
                         <Text style={[styles.slotText, selectedSlot === slot && styles.slotTextSelected]}>
@@ -61,22 +79,21 @@ export default function StoreDetailScreen({ route }: Props) {
                 ))}
             </View>
 
-            {/* Desabilitado até escolher um horário: o botão "conta" o que falta fazer. */}
+            {/* Desabilitado sem horário, durante o salvamento e depois de confirmado
+                (evita agendar o mesmo horário duas vezes sem querer). */}
             <Pressable
-                style={[styles.confirmButton, !selectedSlot && styles.confirmButtonDisabled]}
-                disabled={!selectedSlot}
-                onPress={async () => {
-                    // Ligação mínima (Aula 10): só salva, para a aba Agenda ter dado real.
-                    await addSchedule({ storeId: store.id, storeName: store.name, slot: selectedSlot! })
-                    setConfirmed(true)
-                }}
+                style={[styles.confirmButton, (!selectedSlot || saving || confirmed) && styles.confirmButtonDisabled]}
+                disabled={!selectedSlot || saving || confirmed}
+                onPress={handleSchedule}
             >
-                <Text style={styles.confirmButtonText}>Agendar Agora</Text>
+                <Text style={styles.confirmButtonText}>{saving ? 'Salvando…' : 'Agendar Agora'}</Text>
             </Pressable>
+
+            {saveError && <Text style={styles.saveErrorText}>{saveError}</Text>}
 
             {confirmed && selectedSlot && (
                 <Text style={styles.confirmedText}>
-                    Agendado para {selectedSlot} em {store.name}!
+                    Agendado para {selectedSlot} em {store.name}! Confira na aba Agenda.
                 </Text>
             )}
         </ScrollView>
@@ -112,5 +129,6 @@ const styles = StyleSheet.create({
   },
   confirmButtonDisabled: { opacity: 0.4 },
   confirmButtonText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  saveErrorText: { marginTop: 16, color: '#B00020', textAlign: 'center' },
   confirmedText: { marginTop: 16, color: '#2C5F2D', textAlign: 'center' },
 });

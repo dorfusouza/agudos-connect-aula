@@ -2,7 +2,7 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from '
 import { useSchedules } from '../hooks/useSchedules';
 
 export default function ScheduleScreen() {
-  const { schedules, loading, cancelSchedule } = useSchedules();
+  const { schedules, loading, error, cancelSchedule } = useSchedules();
 
   if (loading) {
     return (
@@ -15,6 +15,9 @@ export default function ScheduleScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Agenda</Text>
+
+      {/* Aula 11: a falha aparece na tela em vez de ficar só no console. */}
+      {error && <Text style={styles.errorText}>{error}</Text>}
 
       <FlatList
         data={schedules}
@@ -45,6 +48,7 @@ const styles = StyleSheet.create({
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 22, fontWeight: '700' },
   list: { paddingTop: 16, paddingBottom: 24, gap: 12 },
+  errorText: { color: '#B00020', fontSize: 14, marginTop: 8 },
   empty: { fontSize: 14, color: '#666', marginTop: 12 },
   card: {
     flexDirection: 'row',
