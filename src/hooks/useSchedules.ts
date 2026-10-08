@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import { useFocusEffect } from '@react-navigation/native'
 import { Schedule } from '../types'
-import { getSchedules, removeSchedule } from '../storage/schedulesStorage'
+import { scheduleRepository } from '../storage/ScheduleRepository'
 
 // Mesma ideia do useStores (loading + dados), mas a fonte é o AsyncStorage e o
 // recarregamento acontece a cada vez que a TELA ganha foco, não só na montagem.
@@ -16,7 +16,7 @@ export function useSchedules() {
         // o loading termina com sucesso OU com erro.
         try {
             setError(null)
-            const data = await getSchedules()
+            const data = await scheduleRepository.getAll()
             // Mais recente primeiro. createdAt é ISO string, então a ordem
             // alfabética das strings já é a ordem cronológica.
             setSchedules([...data].sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
@@ -38,7 +38,7 @@ export function useSchedules() {
 
     async function cancelSchedule(id: string) {
         try {
-            await removeSchedule(id)
+            await scheduleRepository.remove(id)
             await load() // recarrega do storage: a tela mostra o que está salvo de verdade
         } catch {
             setError('Não foi possível cancelar o agendamento.')

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types'
 import { useStore } from '../hooks/useStore'
-import { addSchedule } from '../storage/schedulesStorage'
+import { scheduleRepository, DuplicateScheduleError } from '../storage/ScheduleRepository'
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'StoreDetail'>
@@ -41,11 +41,16 @@ export default function StoreDetailScreen({ route }: Props) {
         setSaving(true)
         setSaveError(null)
         try {
-            await addSchedule({ storeId: store.id, storeName: store.name, slot: selectedSlot })
+            await scheduleRepository.create({ storeId: store.id, storeName: store.name, slot: selectedSlot })
             setConfirmed(true)
-        } catch {
+        } catch (error) {
             // Falhou: não mostra "Agendado!" e deixa o aluno tentar de novo.
-            setSaveError('Não foi possível salvar o agendamento. Tente novamente.')
+            // instanceof distingue o erro da REGRA (duplicado) de uma falha qualquer.
+            setSaveError(
+                error instanceof DuplicateScheduleError
+                    ? 'Você já tem esse horário agendado nesta loja.'
+                    : 'Não foi possível salvar o agendamento. Tente novamente.'
+            )
         } finally {
             setSaving(false) // roda sempre: com sucesso ou com erro, o botão volta ao normal
         }
