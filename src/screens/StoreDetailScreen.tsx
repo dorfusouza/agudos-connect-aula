@@ -4,6 +4,7 @@ import { RootStackParamList } from '../types'
 import { useStore } from '../hooks/useStore'
 import { scheduleRepository, DuplicateScheduleError } from '../storage/ScheduleRepository'
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import CheckInSection from '../components/CheckInSection'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'StoreDetail'>
 
@@ -101,6 +102,7 @@ export default function StoreDetailScreen({ route }: Props) {
                     Agendado para {selectedSlot} em {store.name}! Confira na aba Agenda.
                 </Text>
             )}
+            <CheckInSection storeId={store.id} storeName={store.name} />
         </ScrollView>
     );
 }
