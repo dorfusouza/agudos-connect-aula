@@ -29,7 +29,6 @@ export class AsyncStorageRepository<T extends { id: string }> {
 
     async remove(id: string): Promise<void> {
         const items = await this.getAll()
-        await AsyncStorage.setItem(this.key,
-             JSON.stringify(items.filter((item) => item.id !== id)))
+        await AsyncStorage.setItem(this.key, JSON.stringify(items.filter((item) => item.id !== id)))
     }
 }
